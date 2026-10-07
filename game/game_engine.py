@@ -1,3 +1,5 @@
+import array
+import math
 import pygame
 from .snake import Snake
 from .food import Food
@@ -23,6 +25,8 @@ class GameEngine:
         self.font = pygame.font.SysFont("Arial", 30)
         self.game_over_font = pygame.font.SysFont("Arial", 48)
         self.game_over_detail_font = pygame.font.SysFont("Arial", 24)
+        self.food_sound = self._create_sound(880, 0.12)
+        self.game_over_sound = self._create_sound(330, 0.35, 110)
 
         self.moves_per_second = 8
         self._frame_counter = 0
@@ -30,6 +34,38 @@ class GameEngine:
         self.game_over = False
         self.exit_requested = False
         self.restart_speed = None
+
+    @staticmethod
+    def _create_sound(start_frequency, duration, end_frequency=None):
+        try:
+            if pygame.mixer.get_init() is None:
+                pygame.mixer.init()
+            sample_rate, _, channels = pygame.mixer.get_init()
+            sample_count = int(sample_rate * duration)
+            samples = array.array("h")
+            for index in range(sample_count):
+                progress = index / sample_count
+                frequency = start_frequency
+                if end_frequency is not None:
+                    frequency += (end_frequency - start_frequency) * progress
+                envelope = 1 - progress
+                value = int(10000 * envelope * math.sin(
+                    2 * math.pi * frequency * index / sample_rate
+                ))
+                samples.extend([value] * channels)
+            return pygame.mixer.Sound(buffer=samples.tobytes())
+        except pygame.error:
+            return None
+
+    @staticmethod
+    def _play_sound(sound):
+        if sound is not None:
+            sound.play()
+
+    def _end_game(self):
+        if not self.game_over:
+            self.game_over = True
+            self._play_sound(self.game_over_sound)
 
     def handle_keydown(self, key):
         if self.game_over:
@@ -72,18 +108,19 @@ class GameEngine:
         self.snake.move()
 
         if self.snake.collides_with_wall(self.grid_width, self.grid_height):
-            self.game_over = True
+            self._end_game()
             return
 
         if self.snake.collides_with_self():
-            self.game_over = True
+            self._end_game()
             return
 
         if self.snake.head_rect().colliderect(self.food.rect()):
             self.snake.grow()
             self.score += 1
+            self._play_sound(self.food_sound)
             if not self.food.respawn(self.snake.body):
-                self.game_over = True
+                self._end_game()
 
     def render(self, screen):
         # Draw food
