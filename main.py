@@ -10,7 +10,6 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake - Pygame Version")
 
 # Colors
-WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # Clock
@@ -38,7 +37,6 @@ def main():
                     engine.moves_per_second = moves_per_second
                     break
 
-        engine.handle_input()
         engine.update()
         engine.render(SCREEN)
 

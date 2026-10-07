@@ -90,11 +90,6 @@ class GameEngine:
         elif key in (pygame.K_RIGHT, pygame.K_d):
             self.snake.set_direction(1, 0)
 
-    def handle_input(self):
-        # Reserved for continuously-held-key input (not used for a
-        # grid-based snake, but kept here to mirror the engine's shape).
-        pass
-
     def update(self):
         if self.game_over:
             return
