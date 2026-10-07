@@ -67,7 +67,8 @@ class GameEngine:
         if self.snake.head_rect().colliderect(self.food.rect()):
             self.snake.grow()
             self.score += 1
-            self.food.respawn(self.snake.body)
+            if not self.food.respawn(self.snake.body):
+                self.game_over = True
 
     def render(self, screen):
         # Draw food

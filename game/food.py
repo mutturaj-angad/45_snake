@@ -11,11 +11,17 @@ class Food:
         self.respawn([])
 
     def respawn(self, occupied_cells):
-        while True:
-            self.x = random.randint(0, self.grid_width - 1)
-            self.y = random.randint(0, self.grid_height - 1)
-            if (self.x, self.y) not in occupied_cells:
-                break
+        available_cells = [
+            (x, y)
+            for x in range(self.grid_width)
+            for y in range(self.grid_height)
+            if (x, y) not in occupied_cells
+        ]
+        if not available_cells:
+            return False
+
+        self.x, self.y = random.choice(available_cells)
+        return True
 
     def rect(self):
         return pygame.Rect(self.x * self.cell_size, self.y * self.cell_size, self.cell_size, self.cell_size)

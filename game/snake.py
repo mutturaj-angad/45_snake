@@ -7,10 +7,17 @@ class Snake:
         self.body = [(x, y), (x - 1, y), (x - 2, y)]
         self.direction = (1, 0)  # moving right
         self.grow_pending = False
+        self._turn_locked = False
 
     def set_direction(self, dx, dy):
-        # NOTE: does not currently guard against reversing directly
-        # into the segment behind the head.
+        # Allow at most one turn between moves so quick key presses cannot
+        # reverse the snake into the segment behind its head.
+        if self._turn_locked:
+            return
+        if (dx, dy) == (-self.direction[0], -self.direction[1]):
+            return
+        if (dx, dy) != self.direction:
+            self._turn_locked = True
         self.direction = (dx, dy)
 
     def move(self):
@@ -23,6 +30,7 @@ class Snake:
             self.grow_pending = False
         else:
             self.body.pop()
+        self._turn_locked = False
 
     def grow(self):
         self.grow_pending = True
