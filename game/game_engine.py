@@ -29,10 +29,19 @@ class GameEngine:
 
         self.game_over = False
         self.exit_requested = False
+        self.restart_speed = None
 
     def handle_keydown(self, key):
         if self.game_over:
-            self.exit_requested = True
+            difficulty_speeds = {
+                pygame.K_1: 5,
+                pygame.K_2: 8,
+                pygame.K_3: 12,
+            }
+            if key in difficulty_speeds:
+                self.restart_speed = difficulty_speeds[key]
+            elif key == pygame.K_ESCAPE:
+                self.exit_requested = True
             return
 
         # Direction changes are applied immediately on key press.
@@ -97,9 +106,13 @@ class GameEngine:
             final_score = self.game_over_detail_font.render(
                 f"Final score: {self.score}", True, WHITE
             )
-            prompt = self.game_over_detail_font.render(
-                "Press any key to exit", True, WHITE
-            )
             screen.blit(title, title.get_rect(center=(self.width // 2, self.height // 2 - 60)))
             screen.blit(final_score, final_score.get_rect(center=(self.width // 2, self.height // 2)))
-            screen.blit(prompt, prompt.get_rect(center=(self.width // 2, self.height // 2 + 45)))
+            choices = self.game_over_detail_font.render(
+                "1: Easy    2: Medium    3: Hard", True, WHITE
+            )
+            exit_prompt = self.game_over_detail_font.render(
+                "Esc: Exit", True, WHITE
+            )
+            screen.blit(choices, choices.get_rect(center=(self.width // 2, self.height // 2 + 45)))
+            screen.blit(exit_prompt, exit_prompt.get_rect(center=(self.width // 2, self.height // 2 + 80)))

@@ -21,6 +21,7 @@ FPS = 60
 engine = GameEngine(WIDTH, HEIGHT)
 
 def main():
+    global engine
     running = True
     while running:
         SCREEN.fill(BLACK)
@@ -31,6 +32,11 @@ def main():
                 engine.handle_keydown(event.key)
                 if engine.exit_requested:
                     running = False
+                elif engine.restart_speed is not None:
+                    moves_per_second = engine.restart_speed
+                    engine = GameEngine(WIDTH, HEIGHT)
+                    engine.moves_per_second = moves_per_second
+                    break
 
         engine.handle_input()
         engine.update()
